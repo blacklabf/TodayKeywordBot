@@ -32,7 +32,10 @@ public class Bot extends ListenerAdapter
 
         // Sets the global command list to the provided commands (removing all others)
         jda.updateCommands().addCommands(
-                Commands.slash("ping", "Calculate ping of the bot"),
+                Commands.slash("ping", "Calculate ping of the bot")
+                        .addOption(OptionType.STRING, "message", "message", true),
+                Commands.slash("news", "Search news")
+                        .addOption(OptionType.STRING, "message", "message", true),
                 Commands.slash("ban", "Ban a user from the server")
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS)) // only usable with ban permissions
                         .setGuildOnly(true) // Ban command only works inside a guild
@@ -47,11 +50,18 @@ public class Bot extends ListenerAdapter
         // make sure we handle the right command
         switch (event.getName()) {
             case "ping":
-                System.out.println("ping!");
                 long time = System.currentTimeMillis();
-                event.reply("Pong!").setEphemeral(true) // reply or acknowledge
+                String message = event.getOption("message").getAsString();
+                event.reply("pong!").setEphemeral(true) // reply or acknowledge
                         .flatMap(v ->
-                                event.getHook().editOriginalFormat("Pong: %d ms", System.currentTimeMillis() - time) // then edit original
+                                event.getHook().editOriginalFormat(message) // then edit original
+                        ).queue(); // Queue both reply and edit
+                break;
+            case "news":
+                long newstime = System.currentTimeMillis();
+                event.reply("News!").setEphemeral(true) // reply or acknowledge
+                        .flatMap(v ->
+                                event.getHook().editOriginalFormat("News: %d ms", System.currentTimeMillis() - newstime) // then edit original
                         ).queue(); // Queue both reply and edit
                 break;
             case "ban":
